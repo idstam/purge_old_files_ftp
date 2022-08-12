@@ -1,3 +1,4 @@
+import datetime
 import sys
 from ftplib import FTP
 
@@ -14,6 +15,10 @@ def collect_files(dir_line):
     file_info['file_name'] = tokens[8]
     ftp_date = parser.parse(file_info['ftp_date'])
     file_info['sortable_date'] = ftp_date.strftime("%Y-%m-%d %H:%M")
+
+    n = datetime.datetime.now()
+    delta = n - ftp_date
+    file_info['days'] = delta.days
 
     if file_info['file_name'] == "." or file_info['file_name'] == "..":
         return
@@ -58,10 +63,11 @@ for fi in file_infos:
     if trigger_type == "s" and trigger_size > trigger_value and fi['sortable_date'] != last_date:
         print("Would delete due to size")
 
-    #    if trigger_type == "d" and trigger_value > count:
-    #        print("Would delete due to date")
+    if trigger_type == "d" and fi['days'] > trigger_value:
+        print("Would delete due to date")
 
     last_date = fi['sortable_date']
-    print(fi['sortable_date'] + " " + fi['file_name'] + " " + str(trigger_size))
+    print(fi['sortable_date'] + " " + fi['file_name'] + " " + str(fi['days']) + " " + str(trigger_size) + " " + str(
+        count))
 
 ftp.quit()
