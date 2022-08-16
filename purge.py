@@ -36,10 +36,10 @@ arg_parser.add_argument('--password', type=str, help='Password')
 arg_parser.add_argument('--hostname', type=str, help='Hostname')
 arg_parser.add_argument('--folder', type=str, default='/', help='Folder')
 arg_parser.add_argument('--count', type=int, default='1000', help='Number of files to keep')
-arg_parser.add_argument('--size', type=int, default='1000', help='Total size im MB to keep')
+arg_parser.add_argument('--size', type=int, default='1000', help='Total size in MB to keep')
 arg_parser.add_argument('--days', type=int, default='100', help='Number of days to keep')
 arg_parser.add_argument('--verbose', type=bool, default=False, help='Output trace log')
-
+arg_parser.add_argument('--dryrun', type=bool, default=False, help='Do not do the actual delete. Just log it')
 args = arg_parser.parse_args()
 
 if args.verbose:
@@ -96,7 +96,15 @@ for fi in file_infos:
 
     if do_delete:
         if args.verbose:
-            print("Delete" + '\t' + str(count) + "\t" + str(int(trigger_size)) + "\t" + str(fi['days']) + '\t' + fi['file_name'])
+
+            if not args.dryrun:
+                print("Delete" + '\t' + str(count) + "\t" + str(int(trigger_size)) + "\t" + str(fi['days']) + '\t' + fi[
+                    'file_name'])
+                ftp.delete(args.folder + fi['file_name'])
+            else:
+                print("Deletable" + '\t' + str(count) + "\t" + str(int(trigger_size)) + "\t" + str(fi['days']) + '\t' +
+                      fi[
+                          'file_name'])
     else:
         if args.verbose:
             print("Keep" + '\t' + str(count) + "\t" + str(int(trigger_size)) + "\t" + str(fi['days']) + '\t' + fi['file_name'])
